@@ -1,30 +1,129 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2 class="mb-4 fw-bold">Latest Posts</h2>
+
+<!-- Messages -->
+{% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
 <div class="row">
-  {% for post in posts %}
-  <div class="col-md-4 mb-4">
-    <div class="card h-100 shadow-sm">
-      {% if post.image %}
-        <img src="{{ post.image.url }}" class="card-img-top" style="height:200px;object-fit:cover;">
-      {% endif %}
-      <div class="card-body">
-        {% if post.category %}
-          <span class="badge bg-secondary mb-2">{{ post.category }}</span>
-        {% endif %}
-        <h5 class="card-title">{{ post.title }}</h5>
-        <p class="card-text text-muted">{{ post.content|truncatewords:20 }}</p>
+  <div class="col-md-8">
+    <h2 class="mb-4 fw-bold">Latest Posts</h2>
+    <div class="row">
+      {% for post in posts %}
+      <div class="col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
+          {% if post.image %}
+            <img src="{{ post.image.url }}" class="card-img-top"
+                 style="height:180px;object-fit:cover;">
+          {% endif %}
+          <div class="card-body">
+            {% if post.category %}
+              <span class="badge bg-secondary mb-2">
+                {{ post.category }}
+              </span>
+            {% endif %}
+            <h5 class="card-title">{{ post.title }}</h5>
+            <p class="card-text text-muted">
+              {{ post.content|truncatewords:15 }}
+            </p>
+          </div>
+          <div class="card-footer d-flex justify-content-between align-items-center">
+            <small class="text-muted">
+              By {{ post.author }} · {{ post.created_at|date:"M d, Y" }}
+            </small>
+            <a href="/post/{{ post.id }}/"
+               class="btn btn-sm btn-primary">Read more</a>
+          </div>
+        </div>
       </div>
-      <div class="card-footer d-flex justify-content-between align-items-center">
-        <small class="text-muted">By {{ post.author }} · {{ post.created_at|date:"M d, Y" }}</small>
-        <a href="/post/{{ post.id }}/" class="btn btn-sm btn-primary">Read more</a>
+      {% empty %}
+      <div class="col-12">
+        <p class="text-muted">
+          No posts yet.
+          {% if user.is_authenticated %}
+            <a href="/post/create/">Be the first to write one!</a>
+          {% else %}
+            <a href="/login/">Login</a> to write the first post!
+          {% endif %}
+        </p>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- AI Chatbot — all posts context -->
+  <div class="col-md-4">
+    <div class="card shadow-sm sticky-top" style="top:20px">
+      <div class="card-header bg-dark text-white fw-bold">
+        🤖 Ask AI about our blog
+      </div>
+      <div class="card-body">
+        <div id="chat-messages"
+             style="height:300px;overflow-y:auto;
+                    border:1px solid #eee;padding:10px;
+                    border-radius:8px;margin-bottom:10px;">
+          <p class="text-muted small">
+            Ask me about any post on this blog!
+          </p>
+        </div>
+        <input type="text" id="chat-input"
+               class="form-control mb-2"
+               placeholder="What posts do you have?">
+        <button class="btn btn-dark w-100"
+                onclick="sendChat()">Ask AI</button>
       </div>
     </div>
   </div>
-  {% empty %}
-  <div class="col-12">
-    <p class="text-muted">No posts yet. <a href="/post/create/">Be the first to write one!</a></p>
-  </div>
-  {% endfor %}
 </div>
+
+<script>
+async function sendChat() {
+  const input    = document.getElementById('chat-input');
+  const messages = document.getElementById('chat-messages');
+  const question = input.value.trim();
+  if (!question) return;
+
+  messages.innerHTML += `
+    <div class="text-end mb-2">
+      <span class="badge bg-primary">${question}</span>
+    </div>`;
+  input.value = '';
+
+  try {
+    const res = await fetch('/api/ai/chat/', {
+      method:  'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken':  getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+        question: question
+        // no post_id = home page = all posts context
+      })
+    });
+    const data = await res.json();
+    messages.innerHTML += `
+      <div class="mb-2">
+        <span class="badge bg-secondary">🤖</span>
+        <small>${data.answer}</small>
+      </div>`;
+  } catch(e) {
+    messages.innerHTML += `
+      <div class="text-danger small">Error. Try again.</div>`;
+  }
+  messages.scrollTop = messages.scrollHeight;
+}
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+</script>
 {% endblock %}

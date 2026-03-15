@@ -26,8 +26,6 @@ urlpatterns = [
     path('jwt/profile/',  jwt_views.jwt_profile_view),
 
     # AI endpoints
-    path('ai/summarize/',        views.ai_summarize),
-    path('ai/tags/',             views.ai_generate_tags),
-    path('ai/suggest-category/', views.ai_suggest_category),
-    path('ai/chat/',             views.ai_chat),
+    path('ai/summarize/', views.ai_summarize),
+    path('ai/chat/',      views.ai_chat),
 ]

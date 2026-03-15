@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="d-flex align-items-center mb-4">
+  <h2 class="fw-bold mb-0">{{ category.name }}</h2>
+  <span class="badge bg-secondary ms-3">{{ posts.count }} posts</span>
+</div>
+{% if category.description %}
+  <p class="text-muted mb-4">{{ category.description }}</p>
+{% endif %}
+<div class="row">
+  {% for post in posts %}
+  <div class="col-md-4 mb-4">
+    <div class="card h-100 shadow-sm">
+      {% with post.get_cover_image as cover %}
+        {% if cover %}
+          <img src="{{ cover }}" class="card-img-top"
+               style="height:180px;object-fit:cover;">
+        {% endif %}
+      {% endwith %}
+      <div class="card-body">
+        <h5 class="card-title">{{ post.title }}</h5>
+        <p class="card-text text-muted">
+          {{ post.content|striptags|truncatewords:15 }}
+        </p>
+      </div>
+      <div class="card-footer d-flex justify-content-between">
+        <small class="text-muted">{{ post.author }}</small>
+        <a href="/post/{{ post.id }}/"
+           class="btn btn-sm btn-primary">Read more</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-muted">No posts in this category yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

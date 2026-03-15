@@ -1,6 +1,23 @@
 from django.contrib import admin
 from .models import Post, Category, Comment
 
-admin.site.register(Post)
-admin.site.register(Category)
-admin.site.register(Comment)
+
+@admin.register(Post)
+class PostAdmin(admin.ModelAdmin):
+    list_display   = ['title', 'author', 'category', 'status', 'created_at']
+    list_filter    = ['status', 'category', 'created_at']
+    search_fields  = ['title', 'content']
+    list_editable  = ['status']
+    prepopulated_fields = {}
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display  = ['name', 'slug', 'created_at']
+    search_fields = ['name']
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display  = ['author', 'post', 'sentiment', 'created_at']
+    list_filter   = ['sentiment']

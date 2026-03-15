@@ -1,34 +1,258 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="row justify-content-center">
+{{ form.media }}
+<div class="row">
   <div class="col-md-8">
     <h2 class="fw-bold mb-4">{{ title }}</h2>
+
+    <!-- Messages -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-info">{{ message }}</div>
+      {% endfor %}
+    {% endif %}
+
     <div class="card shadow-sm p-4">
       <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
+
+        <!-- Title -->
         <div class="mb-3">
           <label class="form-label fw-bold">Title</label>
           {{ form.title }}
         </div>
-        <div class="mb-3">
-          <label class="form-label fw-bold">Content</label>
-          {{ form.content }}
-        </div>
+
+        <!-- Category + Add new -->
         <div class="mb-3">
           <label class="form-label fw-bold">Category</label>
-          {{ form.category }}
+          <div class="d-flex gap-2">
+            {{ form.category }}
+            <button type="button"
+                    class="btn btn-outline-secondary"
+                    data-bs-toggle="modal"
+                    data-bs-target="#catModal">
+              + New
+            </button>
+          </div>
         </div>
-        <div class="mb-3">
-          <label class="form-label fw-bold">Cover Image</label>
-          {{ form.image }}
-        </div>
+
+        <!-- Status -->
         <div class="mb-3">
           <label class="form-label fw-bold">Status</label>
           {{ form.status }}
         </div>
-        <button type="submit" class="btn btn-success w-100">Save Post</button>
+
+        <!-- Cover image section -->
+        <div class="mb-3">
+          <label class="form-label fw-bold">Cover image</label>
+          <ul class="nav nav-tabs mb-2" id="imgTab">
+            <li class="nav-item">
+              <button class="nav-link active"
+                      data-bs-toggle="tab"
+                      data-bs-target="#uploadImg"
+                      type="button">
+                Upload file
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link"
+                      data-bs-toggle="tab"
+                      data-bs-target="#urlImg"
+                      type="button">
+                Image URL
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="uploadImg">
+              {{ form.image }}
+              <small class="text-muted">
+                JPG, PNG, GIF, WebP supported
+              </small>
+            </div>
+            <div class="tab-pane fade" id="urlImg">
+              {{ form.image_url }}
+              <small class="text-muted">
+                Paste direct image URL
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Video section -->
+        <div class="mb-3">
+          <label class="form-label fw-bold">Video (optional)</label>
+          <ul class="nav nav-tabs mb-2" id="vidTab">
+            <li class="nav-item">
+              <button class="nav-link active"
+                      data-bs-toggle="tab"
+                      data-bs-target="#uploadVid"
+                      type="button">
+                Upload video
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link"
+                      data-bs-toggle="tab"
+                      data-bs-target="#urlVid"
+                      type="button">
+                Video URL
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="uploadVid">
+              {{ form.video }}
+              <small class="text-muted">
+                MP4, MOV, AVI supported
+              </small>
+            </div>
+            <div class="tab-pane fade" id="urlVid">
+              {{ form.video_url }}
+              <small class="text-muted">
+                YouTube, Vimeo, or direct video link
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rich text content -->
+        <div class="mb-3">
+          <label class="form-label fw-bold">Content</label>
+          {{ form.content }}
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 mt-2">
+          Save Post
+        </button>
       </form>
     </div>
   </div>
+
+  <!-- Tips sidebar -->
+  <div class="col-md-4">
+    <div class="card shadow-sm p-3">
+      <h6 class="fw-bold">Writing tips</h6>
+      <ul class="small text-muted">
+        <li>Use headings to structure your post</li>
+        <li>Add images inside content using TinyMCE toolbar</li>
+        <li>Embed YouTube videos using media button</li>
+        <li>Use code blocks for code snippets</li>
+        <li>Set status to Published when ready</li>
+      </ul>
+    </div>
+
+    <div class="card shadow-sm p-3 mt-3">
+      <h6 class="fw-bold">Supported formats</h6>
+      <ul class="small text-muted">
+        <li>Bold, Italic, Underline</li>
+        <li>Headings H1-H6</li>
+        <li>Bullet and numbered lists</li>
+        <li>Tables</li>
+        <li>Code blocks</li>
+        <li>Images and videos</li>
+        <li>Links</li>
+      </ul>
+    </div>
+  </div>
 </div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="catModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Create new category</h5>
+        <button type="button" class="btn-close"
+                data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-3">
+          <label class="form-label">Category name</label>
+          <input type="text" id="cat-name"
+                 class="form-control"
+                 placeholder="e.g. Technology">
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Description (optional)</label>
+          <textarea id="cat-desc"
+                    class="form-control"
+                    rows="2"></textarea>
+        </div>
+        <div id="cat-error" class="text-danger small"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary"
+                data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary"
+                onclick="createCategory()">Create</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function createCategory() {
+  const name = document.getElementById('cat-name').value.trim();
+  const desc = document.getElementById('cat-desc').value.trim();
+
+  if (!name) {
+    document.getElementById('cat-error').textContent = 'Name is required';
+    return;
+  }
+
+  // Show loading
+  document.getElementById('cat-error').textContent = 'Creating...';
+
+  try {
+    const res = await fetch('/category/create/', {
+      method:  'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken':  getCookie('csrftoken')
+      },
+      body: JSON.stringify({
+        name:        name,
+        description: desc
+      })
+    });
+
+    // Show raw response for debugging
+    const text = await res.text();
+    console.log('Response status:', res.status);
+    console.log('Response body:', text);
+
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch(e) {
+      document.getElementById('cat-error').textContent = 'Server error: ' + text;
+      return;
+    }
+
+    if (data.id) {
+      const select = document.querySelector('select[name="category"]');
+      const option = new Option(data.name, data.id, true, true);
+      select.add(option);
+      bootstrap.Modal.getInstance(
+        document.getElementById('catModal')
+      ).hide();
+      document.getElementById('cat-name').value = '';
+      document.getElementById('cat-desc').value = '';
+      document.getElementById('cat-error').textContent = '';
+    } else {
+      document.getElementById('cat-error').textContent =
+        data.error || 'Unknown error';
+    }
+  } catch(e) {
+    console.error('Fetch error:', e);
+    document.getElementById('cat-error').textContent = 'Network error: ' + e.message;
+  }
+}
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+}
+</script>
 {% endblock %}

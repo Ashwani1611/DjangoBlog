@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
     'blog',
+    'tinymce',
 ]
 
 MIDDLEWARE = [
@@ -58,6 +59,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'blog.context_processors.categories',
             ],
         },
     },
@@ -65,14 +67,20 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'djangoblog.wsgi.application'
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE':   'django.db.backends.postgresql',
+#         'NAME':     'djangoblog_db',
+#         'USER':     'postgres',
+#         'PASSWORD': 'Ashwani123#',  # ← your pgAdmin password
+#         'HOST':     'localhost',
+#         'PORT':     '5432',
+#     }
+# }
 DATABASES = {
     'default': {
-        'ENGINE':   'django.db.backends.postgresql',
-        'NAME':     'djangoblog_db',
-        'USER':     'postgres',
-        'PASSWORD': 'Ashwani123#',  # ← your pgAdmin password
-        'HOST':     'localhost',
-        'PORT':     '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -115,3 +123,24 @@ SIMPLE_JWT = {
 load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 GEMINI_API_KEY='AIzaSyA2mJnbZbcGv091gNv_ofrWn7q3Xry9ixE'
+
+TINYMCE_DEFAULT_CONFIG = {
+    'height': 500,
+    'menubar': True,
+    'plugins': [
+        'advlist', 'autolink', 'lists', 'link', 'image',
+        'charmap', 'preview', 'anchor', 'searchreplace',
+        'visualblocks', 'code', 'fullscreen', 'insertdatetime',
+        'media', 'table', 'help', 'wordcount'
+    ],
+    'toolbar': (
+        'undo redo | formatselect | bold italic underline strikethrough | '
+        'forecolor backcolor | alignleft aligncenter alignright alignjustify | '
+        'bullist numlist outdent indent | link image media | '
+        'code fullscreen | removeformat help'
+    ),
+    'images_upload_url': '/upload-image/',
+    'automatic_uploads': True,
+    'file_picker_types': 'image media',
+    'media_live_embeds': True,
+}
