@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h3 class="mb-4">Search results for: <strong>"{{ query }}"</strong></h3>
+<div class="row">
+  {% for post in posts %}
+  <div class="col-md-4 mb-4">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">{{ post.title }}</h5>
+        <p class="card-text text-muted">{{ post.content|truncatewords:15 }}</p>
+      </div>
+      <div class="card-footer">
+        <a href="/post/{{ post.id }}/" class="btn btn-sm btn-primary">Read more</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <p class="text-muted">No posts found for "{{ query }}".</p>
+  {% endfor %}
+</div>
+{% endblock %}

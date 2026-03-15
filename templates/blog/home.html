@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4 fw-bold">Latest Posts</h2>
+<div class="row">
+  {% for post in posts %}
+  <div class="col-md-4 mb-4">
+    <div class="card h-100 shadow-sm">
+      {% if post.image %}
+        <img src="{{ post.image.url }}" class="card-img-top" style="height:200px;object-fit:cover;">
+      {% endif %}
+      <div class="card-body">
+        {% if post.category %}
+          <span class="badge bg-secondary mb-2">{{ post.category }}</span>
+        {% endif %}
+        <h5 class="card-title">{{ post.title }}</h5>
+        <p class="card-text text-muted">{{ post.content|truncatewords:20 }}</p>
+      </div>
+      <div class="card-footer d-flex justify-content-between align-items-center">
+        <small class="text-muted">By {{ post.author }} · {{ post.created_at|date:"M d, Y" }}</small>
+        <a href="/post/{{ post.id }}/" class="btn btn-sm btn-primary">Read more</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-12">
+    <p class="text-muted">No posts yet. <a href="/post/create/">Be the first to write one!</a></p>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}
