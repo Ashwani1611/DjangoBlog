@@ -1,6 +1,8 @@
 # from google import genai
 from groq import Groq
-client = Groq(api_key='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')
+import os
+
+client = Groq(api_key=os.environ.get('GROQ_API_KEY', 'your-groq-key-here'))
 
 
 
