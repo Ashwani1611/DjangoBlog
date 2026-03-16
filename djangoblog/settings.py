@@ -122,7 +122,7 @@ SIMPLE_JWT = {
 
 load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
-GEMINI_API_KEY='AIzaSyA2mJnbZbcGv091gNv_ofrWn7q3Xry9ixE'
+
 
 TINYMCE_DEFAULT_CONFIG = {
     'height': 500,
@@ -144,3 +144,8 @@ TINYMCE_DEFAULT_CONFIG = {
     'file_picker_types': 'image media',
     'media_live_embeds': True,
 }
+
+# Auto logout settings
+SESSION_COOKIE_AGE            = 600          # 10 minutes in seconds
+SESSION_SAVE_EVERY_REQUEST    = True         # Reset timer on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True       # Also logout when browser closes
